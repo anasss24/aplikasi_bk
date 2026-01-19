@@ -1,0 +1,71 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Edit Jurusan</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Form Edit Jurusan</h5>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.jurusan.update', $jurusan->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Kode Jurusan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('kode_jurusan') is-invalid @enderror" 
+                                   name="kode_jurusan" value="{{ old('kode_jurusan', $jurusan->kode_jurusan) }}" required>
+                            @error('kode_jurusan')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nama Jurusan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('nama_jurusan') is-invalid @enderror" 
+                                   name="nama_jurusan" value="{{ old('nama_jurusan', $jurusan->nama_jurusan) }}" required>
+                            @error('nama_jurusan')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
+                                      name="deskripsi" rows="4">{{ old('deskripsi', $jurusan->deskripsi) }}</textarea>
+                            @error('deskripsi')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a href="{{ route('admin.jurusan.index') }}" class="btn btn-secondary">Batal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
