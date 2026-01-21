@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing');
 });
 
 // OTP Verification routes - withoutMiddleware Authenticate
@@ -54,22 +54,28 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/siswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
     
     // Jadwal Konseling
-    Route::resource('jadwal', JadwalController::class);
-    Route::post('/jadwal/{id}/approve', [JadwalController::class, 'approve'])->name('jadwal.approve');
-    Route::post('/jadwal/{id}/cancel', [JadwalController::class, 'cancel'])->name('jadwal.cancel');
+    Route::resource('jadwal', JadwalController::class)->parameters(['jadwal' => 'jadwal']);
+    Route::post('/jadwal/{jadwal}/approve', [JadwalController::class, 'approve'])->name('jadwal.approve');
+    Route::post('/jadwal/{jadwal}/reject', [JadwalController::class, 'reject'])->name('jadwal.reject');
+    Route::post('/jadwal/{jadwal}/cancel', [JadwalController::class, 'cancel'])->name('jadwal.cancel');
+    Route::post('/jadwal/{jadwal}/selesai', [JadwalController::class, 'selesai'])->name('jadwal.selesai');
     
     // Riwayat Konseling
-    Route::resource('riwayat', RiwayatKonselingController::class)->except(['show']);
+    Route::get('/riwayat/create', [RiwayatKonselingController::class, 'create'])->name('riwayat.create');
+    Route::get('/riwayat/{riwayat}/catat', [RiwayatKonselingController::class, 'catat'])->name('riwayat.catat');
+    Route::resource('riwayat', RiwayatKonselingController::class)->except(['show', 'create']);
     Route::get('/riwayat/{riwayat}', [RiwayatKonselingController::class, 'show'])->name('riwayat.show');
     
     // Materi BK
     Route::resource('materi', MateriBKController::class)->except(['show']);
     Route::get('/materi/{materi}', [MateriBKController::class, 'show'])->name('materi.show');
+    Route::get('/materi/{materi}/download', [MateriBKController::class, 'download'])->name('materi.download');
     
     // Chat
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{userId}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/api/chat/{userId}/messages', [ChatController::class, 'getMessages']);
     
     // Self Assessment
     Route::resource('assessment', SelfAssessmentController::class)->only(['index', 'create', 'store', 'show']);
@@ -82,6 +88,9 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
     
     // Kelas routes
     Route::get('/admin/kelas', [KelasController::class, 'index'])->name('admin.kelas.index');

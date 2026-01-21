@@ -185,7 +185,7 @@
                                             {{ substr($riwayat->topik ?? '-', 0, 30) }}...
                                         </td>
                                         <td class="px-4 py-3">
-                                            <a href="{{ route('riwayat.show', $riwayat->id) }}" class="btn btn-sm btn-outline-primary" style="border-color: #0099C9; color: #0099C9;">
+                                            <a href="{{ route('riwayat.show', $riwayat->riwayat_id) }}" class="btn btn-sm btn-outline-primary" style="border-color: #0099C9; color: #0099C9;">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>

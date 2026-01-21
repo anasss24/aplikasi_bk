@@ -21,21 +21,6 @@
 
     <div class="row">
         <div class="col-lg-4">
-            <!-- Foto -->
-            <div class="card mb-3">
-                <div class="card-body text-center">
-                    @if($siswa->foto)
-                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_siswa }}" class="img-fluid rounded mb-3" style="max-height: 250px;">
-                    @else
-                        <div class="bg-light rounded mb-3 p-5">
-                            <i class="fas fa-user fa-5x text-muted"></i>
-                        </div>
-                    @endif
-                    <h5>{{ $siswa->nama_siswa }}</h5>
-                    <p class="text-muted mb-0">NIS: {{ $siswa->nis }}</p>
-                </div>
-            </div>
-
             <!-- Info Singkat -->
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -43,18 +28,16 @@
                 </div>
                 <div class="list-group list-group-flush">
                     <div class="list-group-item">
+                        <small class="text-muted d-block">Nama Siswa</small>
+                        <strong>{{ $siswa->nama_siswa }}</strong>
+                    </div>
+                    <div class="list-group-item">
                         <small class="text-muted d-block">Jenis Kelamin</small>
                         <strong>{{ $siswa->jenis_kelamin }}</strong>
                     </div>
                     <div class="list-group-item">
                         <small class="text-muted d-block">Kelas</small>
                         <strong>{{ $siswa->kelas->nama_kelas ?? '-' }}</strong>
-                    </div>
-                    <div class="list-group-item">
-                        <small class="text-muted d-block">Status</small>
-                        <span class="badge bg-{{ $siswa->status === 'aktif' ? 'success' : 'danger' }}">
-                            {{ ucfirst($siswa->status) }}
-                        </span>
                     </div>
                 </div>
             </div>

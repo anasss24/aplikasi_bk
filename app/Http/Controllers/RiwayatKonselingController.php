@@ -24,8 +24,13 @@ class RiwayatKonselingController extends Controller
             })->with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
         } else if ($user->role === 'guru_bk') {
             // Guru BK lihat riwayat konseling yang mereka tangani
-            $riwayat = RiwayatKonseling::where('created_by', $user->guru_id ?? null)
-                ->with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if ($guru) {
+                $riwayat = RiwayatKonseling::where('created_by', $guru->guru_id)
+                    ->with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
+            } else {
+                $riwayat = collect([]);
+            }
         } else {
             // Admin bisa lihat semua
             $riwayat = RiwayatKonseling::with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
@@ -35,16 +40,55 @@ class RiwayatKonselingController extends Controller
     }
 
     /**
+     * Show the form for catatan sesi konseling
+     */
+    public function catat(RiwayatKonseling $riwayat)
+    {
+        $riwayat->load(['jadwal.siswa', 'jadwal.guru', 'guru']);
+        return view('riwayat.catat', compact('riwayat'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
-    public function create($jadwal_id = null)
+    public function create(Request $request)
     {
-        $jadwals = JadwalKonseling::where('status', 'disetujui')
-            ->doesntHave('riwayat')
-            ->with(['siswa', 'guru'])
-            ->get();
+        $user = Auth::user();
+        $jadwal_id = $request->query('jadwal_id');
+        
+        // Ambil semua siswa untuk dropdown (bisa langsung pilih siswa)
+        $siswa = \App\Models\Siswa::all();
+        
+        // Jika ada jadwal_id specific, ambil jadwal itu langsung (validate berstatus disetujui)
+        $selectedJadwal = null;
+        if ($jadwal_id) {
+            $selectedJadwal = JadwalKonseling::where('jadwal_id', $jadwal_id)
+                ->where('status', 'disetujui')
+                ->with(['siswa', 'guru'])
+                ->first();
             
-        return view('riwayat.create', compact('jadwals', 'jadwal_id'));
+            if (!$selectedJadwal) {
+                return redirect()->route('riwayat.index')
+                    ->with('error', 'Jadwal harus berstatus disetujui untuk membuat riwayat.');
+            }
+        }
+        
+        // Query jadwal yang disetujui dan belum ada riwayat untuk dropdown
+        $query = JadwalKonseling::where('status', 'disetujui')
+            ->doesntHave('riwayat')
+            ->with(['siswa', 'guru']);
+        
+        // Jika guru_bk, hanya tampilkan jadwal mereka sendiri
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if ($guru) {
+                $query = $query->where('guru_id', $guru->guru_id);
+            }
+        }
+        
+        $jadwals = $query->get();
+            
+        return view('riwayat.create', compact('jadwals', 'jadwal_id', 'selectedJadwal', 'siswa'));
     }
 
     /**
@@ -53,32 +97,45 @@ class RiwayatKonselingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'jadwal_id' => 'required|exists:jadwal_konseling,jadwal_id',
-            'topik' => 'required|string|max:255',
+            'siswa_id' => 'required|exists:siswa,id',
+            'tanggal_riwayat' => 'required|date',
+            'waktu_mulai' => 'required|date_format:H:i',
+            'durasi' => 'required|integer|min:5|max:180',
+            'topik' => 'required|in:Akademik,Pribadi,Sosial,Perilaku,Karir,Bullying/Kekerasan,Keluarga,Lainnya',
+            'metode' => 'required|in:tatap_muka,online',
+            'lokasi' => 'nullable|in:ruang_bk,chat',
             'isi_konseling' => 'required|string',
+            'progres' => 'nullable|string',
             'tindak_lanjut' => 'nullable|string',
-            'status_tindak_lanjut' => 'nullable|in:belum_dilaksanakan,sedang_berjalan,selesai',
-            'lampiran_url' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
-            'tanggal_riwayat' => 'nullable|date',
+            'status_tindak_lanjut' => 'nullable|in:selesai,perlu_follow_up',
+            'tanggal_follow_up' => 'nullable|date',
         ]);
 
-        $validated['created_by'] = Auth::user()->guru_id ?? Auth::id();
-        
-        if ($request->hasFile('lampiran_url')) {
-            $file = $request->file('lampiran_url');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/lampiran', $filename);
-            $validated['lampiran_url'] = 'lampiran/' . $filename;
+        // Get guru_id dari relasi GuruBK
+        $user = Auth::user();
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if (!$guru) {
+                return redirect()->back()
+                    ->with('error', 'Data guru BK tidak ditemukan. Hubungi admin.');
+            }
+            $validated['guru_id'] = $guru->guru_id;
+            $validated['created_by'] = $guru->guru_id;
+        } else {
+            return redirect()->back()
+                ->with('error', 'Hanya guru BK yang dapat membuat riwayat konseling.');
         }
 
-        if (!isset($validated['tanggal_riwayat'])) {
-            $validated['tanggal_riwayat'] = now();
+        try {
+            RiwayatKonseling::create($validated);
+
+            return redirect()->route('riwayat.index')
+                ->with('success', 'Riwayat konseling berhasil dicatat.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menyimpan riwayat: ' . $e->getMessage())
+                ->withInput();
         }
-
-        RiwayatKonseling::create($validated);
-
-        return redirect()->route('riwayat.index')
-            ->with('success', 'Riwayat konseling berhasil dicatat.');
     }
 
     /**

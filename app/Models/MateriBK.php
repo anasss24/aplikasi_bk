@@ -30,6 +30,6 @@ class MateriBK extends Model
 
     public function guru()
     {
-        return $this->belongsTo(Guru::class, 'guru_id');
+        return $this->belongsTo(GuruBK::class, 'guru_id', 'guru_id');
     }
 }

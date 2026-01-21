@@ -24,8 +24,6 @@ class Siswa extends Model
         'no_telepon',
         'email',
         'kelas_id',
-        'status',
-        'foto'
     ];
 
     protected $casts = [

@@ -37,19 +37,23 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td><span class="badge badge-info">{{ ucfirst($user->role) }}</span></td>
+                                    <td><span class="badge bg-info text-white">{{ ucfirst($user->role) }}</span></td>
                                     <td>
                                         @if($user->is_verified)
-                                            <span class="badge badge-success">Terverifikasi</span>
+                                            <span class="badge bg-success text-white">Terverifikasi</span>
                                         @else
-                                            <span class="badge badge-warning">Belum Verifikasi</span>
+                                            <span class="badge bg-warning text-dark">Belum Verifikasi</span>
                                         @endif
                                     </td>
                                     <td>{{ $user->created_at->format('d M Y') }}</td>
                                     <td>
                                         <div class="btn-group" role="group" style="gap: 5px;">
-                                            <button class="btn btn-primary" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-edit me-2"></i>Edit</button>
-                                            <button class="btn btn-danger" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-trash me-2"></i>Hapus</button>
+                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-primary" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-edit me-2"></i>Edit</a>
+                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline;" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger" data-delete-message="Yakin ingin menghapus user <strong>{{ $user->name }}</strong>? Tindakan ini tidak dapat dibatalkan." style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-trash me-2"></i>Hapus</button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

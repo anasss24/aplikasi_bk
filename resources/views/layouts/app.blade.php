@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
         * {
@@ -183,35 +185,6 @@
             display: flex;
             align-items: center;
             gap: 20px;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-box input {
-            padding: 12px 15px 12px 45px;
-            border: 2px solid #e2e8f0;
-            border-radius: 25px;
-            width: 300px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
         }
 
         .topbar-right {
@@ -565,10 +538,6 @@
                 margin-left: 0;
             }
 
-            .search-box input {
-                width: 200px;
-            }
-
             .page-title {
                 font-size: 1.4rem;
             }
@@ -611,11 +580,6 @@
             padding: 6px 12px;
             border-radius: 20px;
             font-weight: 600;
-        }
-
-        /* Search Box Icon Color */
-        .search-box i {
-            color: #64748b;
         }
 
         /* Animations */
@@ -904,10 +868,6 @@
                 <button class="btn btn-light d-md-none" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="search-box d-none d-md-block">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari...">
-                </div>
             </div>
 
             <div class="topbar-right">
@@ -968,6 +928,8 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
     <script>
         // Real-time Clock
@@ -1007,7 +969,127 @@
                 sidebar.classList.remove('active');
             }
         });
+
+        // Modern Delete Confirmation dengan SweetAlert2
+        function confirmDeleteModern(form, message = 'Yakin ingin menghapus data ini?') {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Hapus Data',
+                html: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                didOpen: (modal) => {
+                    modal.classList.add('modern-alert');
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            return false;
+        }
+
+        // Otomatis convert semua form dengan class 'delete-form' ke SweetAlert
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+            deleteForms.forEach(form => {
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) {
+                    const message = btn.dataset.deleteMessage || 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
+                    btn.removeAttribute('onclick');
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        confirmDeleteModern(form, message);
+                    });
+                }
+            });
+        });
     </script>
+
+    <style>
+        /* Modern Alert Styling */
+        .modern-alert {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Customize SweetAlert2 */
+        .swal2-popup {
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 90% !important;
+            max-width: 400px !important;
+            padding: 1.5rem !important;
+        }
+
+        .swal2-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.8rem;
+        }
+
+        .swal2-html-container {
+            font-size: 0.95rem;
+            color: #666;
+            margin: 1rem 0 !important;
+            line-height: 1.5;
+        }
+
+        .swal2-confirm, .swal2-cancel {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem !important;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #c82333 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .swal2-cancel:hover {
+            background-color: #5a6268 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .swal2-icon-warning {
+            color: #ff9800;
+        }
+
+        .swal2-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .swal2-actions {
+            margin-top: 1.5rem;
+            gap: 10px;
+        }
+    </style>
 
     @yield('scripts')
 </body>

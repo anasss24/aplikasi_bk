@@ -45,9 +45,8 @@ class HomeController extends Controller
                     ->limit(5)
                     ->get();
 
-                $data['riwayatKonseling'] = RiwayatKonseling::whereHas('jadwal', function ($query) use ($siswa) {
-                    $query->where('siswa_id', $siswa->id);
-                })->with(['jadwal.guru'])
+                $data['riwayatKonseling'] = RiwayatKonseling::where('siswa_id', $siswa->id)
+                    ->with(['jadwal.guru', 'siswa'])
                     ->latest()
                     ->limit(5)
                     ->get();
@@ -57,9 +56,7 @@ class HomeController extends Controller
                     ->get();
 
                 $data['totalJadwal'] = JadwalKonseling::where('siswa_id', $siswa->id)->count();
-                $data['totalRiwayat'] = RiwayatKonseling::whereHas('jadwal', function ($query) use ($siswa) {
-                    $query->where('siswa_id', $siswa->id);
-                })->count();
+                $data['totalRiwayat'] = RiwayatKonseling::where('siswa_id', $siswa->id)->count();
             }
             return view('dashboard.siswa', $data);
         } elseif ($user->role === 'guru_bk') {

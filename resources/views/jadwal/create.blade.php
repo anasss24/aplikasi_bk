@@ -27,7 +27,7 @@
                                 <option value="">-- Pilih Siswa --</option>
                                 @foreach($siswaList as $siswa)
                                     <option value="{{ $siswa->id }}" {{ old('siswa_id') == $siswa->id ? 'selected' : '' }}>
-                                        {{ $siswa->nama }}
+                                        {{ $siswa->nama_siswa }} ({{ $siswa->nis }})
                                     </option>
                                 @endforeach
                             </select>
@@ -41,7 +41,7 @@
                             <select name="guru_id" id="guru_id" class="form-control @error('guru_id') is-invalid @enderror" required>
                                 <option value="">-- Pilih Guru BK --</option>
                                 @foreach($guruList as $guru)
-                                    <option value="{{ $guru->id }}" {{ old('guru_id') == $guru->id ? 'selected' : '' }}>
+                                    <option value="{{ $guru->guru_id }}" {{ old('guru_id') == $guru->guru_id ? 'selected' : '' }}>
                                         {{ $guru->nama }}
                                     </option>
                                 @endforeach
@@ -74,11 +74,32 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="lokasi" class="form-label">Lokasi (Opsional)</label>
-                            <input type="text" name="lokasi" id="lokasi" 
-                                   class="form-control @error('lokasi') is-invalid @enderror" 
-                                   value="{{ old('lokasi') }}" placeholder="Ruang BK / Link Meet / dll">
+                            <label for="lokasi" class="form-label">Tempat Konseling</label>
+                            <select name="lokasi" id="lokasi" class="form-control @error('lokasi') is-invalid @enderror">
+                                <option value="">-- Pilih Tempat Konseling --</option>
+                                <option value="ruang_bk" {{ old('lokasi') == 'ruang_bk' ? 'selected' : '' }}>Ruang BK</option>
+                                <option value="chat" {{ old('lokasi') == 'chat' ? 'selected' : '' }}>Chat</option>
+                            </select>
                             @error('lokasi')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="masalah" class="form-label">Masalah yang Sedang Dialami</label>
+                            <select name="masalah" id="masalah" class="form-control @error('masalah') is-invalid @enderror">
+                                <option value="">-- Pilih Masalah --</option>
+                                <option value="masalah_akademik" {{ old('masalah') == 'masalah_akademik' ? 'selected' : '' }}>Masalah Akademik (Nilai, Kesulitan Belajar)</option>
+                                <option value="masalah_keluarga" {{ old('masalah') == 'masalah_keluarga' ? 'selected' : '' }}>Masalah Keluarga</option>
+                                <option value="masalah_sosial" {{ old('masalah') == 'masalah_sosial' ? 'selected' : '' }}>Masalah Sosial (Pertemanan, Bullying)</option>
+                                <option value="masalah_emosional" {{ old('masalah') == 'masalah_emosional' ? 'selected' : '' }}>Masalah Emosional (Stres, Kecemasan, Depresi)</option>
+                                <option value="masalah_karir" {{ old('masalah') == 'masalah_karir' ? 'selected' : '' }}>Masalah Karir & Masa Depan</option>
+                                <option value="masalah_pribadi" {{ old('masalah') == 'masalah_pribadi' ? 'selected' : '' }}>Masalah Pribadi (Kepercayaan Diri, Identitas)</option>
+                                <option value="masalah_kesehatan" {{ old('masalah') == 'masalah_kesehatan' ? 'selected' : '' }}>Masalah Kesehatan & Kebiasaan</option>
+                                <option value="masalah_disiplin" {{ old('masalah') == 'masalah_disiplin' ? 'selected' : '' }}>Masalah Disiplin & Tata Tertib</option>
+                                <option value="lainnya" {{ old('masalah') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                            </select>
+                            @error('masalah')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

@@ -35,7 +35,6 @@
                         <th>Kelas</th>
                         <th>Jenis Kelamin</th>
                         <th>No. Telepon</th>
-                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -48,11 +47,6 @@
                         <td>{{ $s->jenis_kelamin }}</td>
                         <td>{{ $s->no_telepon ?? '-' }}</td>
                         <td>
-                            <span class="badge bg-{{ $s->status === 'aktif' ? 'success' : 'danger' }}">
-                                {{ ucfirst($s->status) }}
-                            </span>
-                        </td>
-                        <td>
                             <div class="btn-group" role="group" style="gap: 5px;">
                                 <a href="{{ route('siswa.show', $s) }}" class="btn btn-outline-info" title="Lihat" style="min-width: 50px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;">
                                     <i class="fas fa-eye"></i>
@@ -61,10 +55,10 @@
                                 <a href="{{ route('siswa.edit', $s) }}" class="btn btn-primary" title="Edit" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a>
-                                <form action="{{ route('siswa.destroy', $s) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('siswa.destroy', $s) }}" method="POST" style="display:inline;" class="delete-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" title="Hapus" onclick="return confirm('Yakin ingin menghapus?')" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;">
+                                    <button type="submit" class="btn btn-danger" title="Hapus" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;">
                                         <i class="fas fa-trash me-2"></i>Hapus
                                     </button>
                                 </form>

@@ -33,14 +33,14 @@
                             <tbody>
                                 @foreach($kuisioners as $kuisioner)
                                     <tr>
-                                        <td>{{ $kuisioner->tanggal->format('d M Y') }}</td>
+                                        <td>{{ $kuisioner->tanggal ? \Carbon\Carbon::parse($kuisioner->tanggal)->format('d M Y') : '-' }}</td>
                                         <td>
-                                            <span class="badge bg-info">{{ $kuisioner->skor_total }}</span>
+                                            <span class="badge bg-info">{{ $kuisioner->skor_total ?? '-' }}</span>
                                         </td>
-                                        <td>{{ Str::limit($kuisioner->komentar, 50) }}</td>
+                                        <td>{{ $kuisioner->komentar ? Str::limit($kuisioner->komentar, 50) : '-' }}</td>
                                         <td>
-                                            <a href="{{ route('kuisioner.show', $kuisioner->kuisioner_id) }}" class="btn btn-sm btn-outline-primary">
-                                                Lihat
+                                            <a href="{{ route('kuisioner.show', $kuisioner->id ?? $kuisioner->kuisioner_id) }}" class="btn btn-sm btn-icon-view" title="Lihat Detail" style="width: 40px; height: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: linear-gradient(135deg, #0099C9, #0077B6); border: none; color: white; transition: all 0.3s ease;">
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
                                     </tr>
@@ -69,4 +69,12 @@
         </div>
     @endif
 </div>
+
+<style>
+    .btn-icon-view:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 16px rgba(0, 153, 201, 0.4) !important;
+    }
+</style>
+
 @endsection

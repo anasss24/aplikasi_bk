@@ -49,7 +49,6 @@
                                 <th class="text-dark fw-bold">Jenis Kelamin</th>
                                 <th class="text-dark fw-bold">No. Telepon</th>
                                 <th class="text-dark fw-bold">Email</th>
-                                <th class="text-dark fw-bold">Status</th>
                                 <th class="text-dark fw-bold text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -82,47 +81,21 @@
                                     </td>
                                     <td>{{ $item->no_telepon ?? '-' }}</td>
                                     <td>{{ $item->email ?? '-' }}</td>
-                                    <td>
-                                        @if($item->status === 'aktif')
-                                            <span class="badge bg-success">Aktif</span>
-                                        @else
-                                            <span class="badge bg-secondary">Tidak Aktif</span>
-                                        @endif
-                                    </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group" style="gap: 5px;">
                                             <a href="/admin/siswa/{{ $item->id }}/edit" class="btn btn-primary btn-sm" title="Edit" style="width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $item->id }}" title="Hapus" style="width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            <form method="POST" action="/admin/siswa/{{ $item->id }}" style="display:inline;" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Hapus" data-delete-message="Apakah Anda yakin ingin menghapus data <strong>{{ $item->nama_siswa }}</strong>? Tindakan ini tidak dapat dibatalkan." style="width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
 
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content border-0">
-                                                    <div class="modal-header bg-danger text-white border-0">
-                                                        <h5 class="modal-title"><i class="fas fa-exclamation-circle me-2"></i>Hapus Data Siswa</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Apakah Anda yakin ingin menghapus data <strong>{{ $item->nama_siswa }}</strong>? Tindakan ini tidak dapat dibatalkan.
-                                                    </div>
-                                                    <div class="modal-footer border-0">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                        <form method="POST" action="/admin/siswa/{{ $item->id }}" style="display:inline;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger">
-                                                                <i class="fas fa-trash me-2"></i>Hapus
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </td>
                                 </tr>
                                 @endforeach

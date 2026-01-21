@@ -31,7 +31,7 @@
 
             <div class="mb-4 pb-4 border-bottom">
               <small class="text-muted">
-                <i class="fas fa-user"></i> <strong>{{ $materi->guru->nama ?? 'Admin' }}</strong>
+                <i class="fas fa-user"></i> <strong>{{ $materi->guru->nama ?? 'Guru BK' }}</strong>
               </small>
               <br>
               <small class="text-muted">
@@ -49,7 +49,7 @@
             @if($materi->file_url)
               <div class="mt-4">
                 <h5 class="mb-3">File Materi</h5>
-                <a href="{{ asset('storage/' . $materi->file_url) }}" class="btn btn-lg btn-primary" target="_blank">
+                <a href="{{ route('materi.download', $materi) }}" class="btn btn-lg btn-primary">
                   <i class="fas fa-download"></i> Download Materi
                 </a>
               </div>
@@ -76,7 +76,7 @@
           <div class="list-group list-group-flush">
             <div class="list-group-item">
               <small class="text-muted d-block">Dibuat Oleh</small>
-              <strong>{{ $materi->guru->nama ?? 'Admin' }}</strong>
+              <strong>{{ $materi->guru->nama ?? 'Guru BK' }}</strong>
             </div>
             <div class="list-group-item">
               <small class="text-muted d-block">Tanggal Upload</small>

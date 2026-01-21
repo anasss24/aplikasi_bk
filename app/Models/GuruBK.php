@@ -10,7 +10,7 @@ class GuruBK extends Model
     protected $fillable = ['guru_id','user_id','nip','nama'];
 
     public function user(){
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
     public function jadwals(){
         return $this->hasMany(JadwalKonseling::class, 'guru_id', 'guru_id');

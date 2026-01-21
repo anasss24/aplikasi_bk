@@ -56,7 +56,7 @@
 
               <div class="mb-3">
                 <small class="text-muted">
-                  <i class="fas fa-user"></i> {{ $m->guru->nama ?? 'Admin' }}
+                  <i class="fas fa-user"></i> {{ $m->guru->nama ?? 'Guru BK' }}
                 </small>
                 <br>
                 <small class="text-muted">
@@ -71,8 +71,8 @@
               </div>
 
               <div class="btn-group w-100" role="group" style="gap: 5px;">
-                <a href="{{ route('materi.show', $m) }}" class="btn btn-outline-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;">
-                  <i class="fas fa-eye me-2"></i> Lihat
+                <a href="{{ route('materi.show', $m) }}" class="btn btn-outline-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;" title="Lihat">
+                  <i class="fas fa-eye"></i>
                 </a>
                 @if(((Auth::user()->role ?? null) === 'guru_bk' && (Auth::user()->guru_id ?? null) === $m->guru_id) || (Auth::user()->role ?? null) === 'admin')
                   <a href="{{ route('materi.edit', $m) }}" class="btn btn-primary" style="flex: 0 0 80px; display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;">
@@ -116,12 +116,26 @@
     }
 
     .card {
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: none;
     }
 
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+      transform: none;
+      box-shadow: none !important;
+    }
+
+    .btn {
+      background-color: #0066cc !important;
+      color: white !important;
+      border: none !important;
+    }
+
+    .btn:hover, .btn:focus, .btn:active, .btn.active {
+      background-color: #0066cc !important;
+      color: white !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
     }
   </style>
 @endsection

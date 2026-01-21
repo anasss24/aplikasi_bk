@@ -31,8 +31,15 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">NIS</label>
+                                <input type="text" name="nis" class="form-control @error('nis') is-invalid @enderror" value="{{ old('nis', $siswa->nis) }}" pattern="[0-9]{1,10}" inputmode="numeric" maxlength="10">
+                                @error('nis')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">NISN <span class="text-danger">*</span></label>
-                                <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror" value="{{ old('nisn', $siswa->nisn) }}" required inputmode="numeric" pattern="[0-9]+" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror" value="{{ old('nisn', $siswa->nisn) }}" required pattern="[0-9]{1,10}" inputmode="numeric" maxlength="10">
                                 @error('nisn')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -103,14 +110,6 @@
                                 <label class="form-label fw-bold">Email</label>
                                 <input type="email" name="email" class="form-control" value="{{ old('email', $siswa->email) }}">
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="aktif" @if(old('status', $siswa->status) === 'aktif') selected @endif>Aktif</option>
-                                <option value="tidak-aktif" @if(old('status', $siswa->status) === 'tidak-aktif') selected @endif>Tidak Aktif</option>
-                            </select>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="gap: 8px !important;">

@@ -53,6 +53,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user has specific role
+     */
+    public function hasRole($role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Relasi ke Siswa
+     */
+    public function siswa()
+    {
+        return $this->hasOne(Siswa::class, 'user_id', 'id');
+    }
+
+    /**
+     * Relasi ke GuruBK
+     */
+    public function guru()
+    {
+        return $this->hasOne(GuruBK::class, 'user_id', 'id');
+    }
+
+    /**
      * Generate OTP code dan simpan ke database
      */
     public function generateOtp(): string

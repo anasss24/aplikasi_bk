@@ -51,10 +51,10 @@
                                     <td>
                                         <div class="btn-group" role="group" style="gap: 5px;">
                                             <a href="{{ route('admin.jurusan.edit', $item->id) }}" class="btn btn-primary" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-edit me-2"></i>Edit</a>
-                                            <form action="{{ route('admin.jurusan.destroy', $item->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('admin.jurusan.destroy', $item->id) }}" method="POST" style="display:inline;" class="delete-form">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus?')" style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-trash me-2"></i>Hapus</button>
+                                                <button type="submit" class="btn btn-danger" data-delete-message="Apakah Anda yakin ingin menghapus jurusan <strong>{{ $item->nama_jurusan }}</strong>? Tindakan ini tidak dapat dibatalkan." style="min-width: 80px; height: 38px; display: flex; align-items: center; justify-content: center; padding: 6px 12px;"><i class="fas fa-trash me-2"></i>Hapus</button>
                                             </form>
                                         </div>
                                     </td>

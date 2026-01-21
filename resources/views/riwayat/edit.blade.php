@@ -71,23 +71,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Lampiran (Opsional)</label>
-                            @if($riwayat->lampiran_url)
-                                <div class="mb-2">
-                                    <a href="{{ asset('storage/' . $riwayat->lampiran_url) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-download"></i> Lihat Lampiran Saat Ini
-                                    </a>
-                                </div>
-                            @endif
-                            <input type="file" name="lampiran_url" class="form-control @error('lampiran_url') is-invalid @enderror" 
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <small class="text-muted">Format: PDF, DOC, DOCX, JPG, PNG (Max 5MB)</small>
-                            @error('lampiran_url')
-                                <span class="invalid-feedback d-block">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                         <div class="form-group d-flex gap-2">
                             <a href="{{ route('riwayat.show', $riwayat) }}" class="btn btn-danger" style="padding: 8px 24px; font-weight: 500; min-width: 100px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-times me-2"></i>Batal
@@ -95,9 +78,6 @@
                             <button type="submit" class="btn btn-primary" style="padding: 8px 24px; font-weight: 500; min-width: 160px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-save me-2"></i>Simpan Perubahan
                             </button>
-                        </div>
-                                <i class="fas fa-times"></i> Batal
-                            </a>
                         </div>
                     </form>
                 </div>

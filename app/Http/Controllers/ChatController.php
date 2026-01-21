@@ -17,13 +17,22 @@ class ChatController extends Controller
         $user = Auth::user();
         
         // Dapatkan semua percakapan unik dengan user lain
-        $chats = Chat::where('pengirim_id', $user->id)
+        $allChats = Chat::where('pengirim_id', $user->id)
             ->orWhere('penerima_id', $user->id)
-            ->orderBy('waktu_kirim', 'desc')
-            ->get()
-            ->groupBy(function ($chat) use ($user) {
-                return $chat->pengirim_id == $user->id ? $chat->penerima_id : $chat->pengirim_id;
-            });
+            ->orderBy('waktu_kirim', 'asc')  // ascending untuk group
+            ->get();
+
+        // Group by user (the other person in the conversation)
+        $chats = $allChats->groupBy(function ($chat) use ($user) {
+            return $chat->pengirim_id == $user->id ? $chat->penerima_id : $chat->pengirim_id;
+        });
+
+        // Reverse setiap group agar pesan terbaru di depan, lalu sort groups by latest message
+        $chats = $chats->map(function ($group) {
+            return $group->reverse()->values();  // Reverse agar terbaru di index 0
+        })->sortBy(function ($group) {
+            return -$group->first()->waktu_kirim->timestamp;  // Sort groups by latest
+        });
 
         return view('chat.index', compact('chats'));
     }
@@ -35,6 +44,35 @@ class ChatController extends Controller
     {
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($userId);
+        
+        // Ambil nama dari relasi user yang sebenarnya
+        $otherUser->load('siswa', 'guru');
+        
+        \Log::info('=== CHAT DEBUG ===');
+        \Log::info('Other User ID: ' . $otherUser->id);
+        \Log::info('Other User Role: ' . $otherUser->role);
+        \Log::info('Other User Name: ' . $otherUser->name);
+        \Log::info('Has siswa relation: ' . ($otherUser->siswa ? 'YES' : 'NO'));
+        if ($otherUser->siswa) {
+            \Log::info('Siswa nama: ' . $otherUser->siswa->nama_siswa);
+        }
+        \Log::info('Has guru relation: ' . ($otherUser->guru ? 'YES' : 'NO'));
+        if ($otherUser->guru) {
+            \Log::info('Guru nama: ' . $otherUser->guru->nama);
+        }
+        
+        $displayName = $otherUser->name;
+        
+        if ($otherUser->hasRole('guru_bk') && $otherUser->guru) {
+            $displayName = $otherUser->guru->nama;
+            \Log::info('Using guru name: ' . $displayName);
+        } 
+        else if ($otherUser->hasRole('siswa') && $otherUser->siswa) {
+            $displayName = $otherUser->siswa->nama_siswa;
+            \Log::info('Using siswa name: ' . $displayName);
+        }
+
+        \Log::info('Final displayName: ' . $displayName);
 
         $messages = Chat::where(function ($query) use ($currentUser, $userId) {
             $query->where('pengirim_id', $currentUser->id)
@@ -50,7 +88,7 @@ class ChatController extends Controller
             ->where('pengirim_id', $userId)
             ->update(['is_read' => true]);
 
-        return view('chat.show', compact('messages', 'otherUser'));
+        return view('chat.show', compact('messages', 'otherUser', 'displayName'));
     }
 
     /**
@@ -71,6 +109,45 @@ class ChatController extends Controller
             'is_read' => false,
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Pesan terkirim!']);
+        }
+
         return back()->with('success', 'Pesan terkirim!');
+    }
+
+    /**
+     * Get messages untuk real-time polling
+     */
+    public function getMessages($userId)
+    {
+        $currentUser = Auth::user();
+        
+        $messages = Chat::where(function ($query) use ($currentUser, $userId) {
+            $query->where('pengirim_id', $currentUser->id)
+                ->where('penerima_id', $userId);
+        })->orWhere(function ($query) use ($currentUser, $userId) {
+            $query->where('pengirim_id', $userId)
+                ->where('penerima_id', $currentUser->id);
+        })->orderBy('waktu_kirim', 'asc')
+            ->get();
+
+        // Tandai pesan sebagai sudah dibaca
+        Chat::where('penerima_id', $currentUser->id)
+            ->where('pengirim_id', $userId)
+            ->update(['is_read' => true]);
+
+        return response()->json([
+            'messages' => $messages->map(function($msg) {
+                return [
+                    'id' => $msg->id,
+                    'pengirim_id' => $msg->pengirim_id,
+                    'penerima_id' => $msg->penerima_id,
+                    'isi_pesan' => $msg->isi_pesan,
+                    'waktu_kirim' => $msg->waktu_kirim,
+                    'is_read' => $msg->is_read,
+                ];
+            })
+        ]);
     }
 }

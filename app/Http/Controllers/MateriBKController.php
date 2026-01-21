@@ -41,7 +41,17 @@ class MateriBKController extends Controller
             'tanggal_upload' => 'nullable|date',
         ]);
 
-        $validated['guru_id'] = Auth::user()->guru_id ?? Auth::id();
+        // Dapatkan guru_id dari relasi GuruBK
+        $user = Auth::user();
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if (!$guru) {
+                return redirect()->back()->with('error', 'Guru BK tidak ditemukan. Hubungi admin.');
+            }
+            $validated['guru_id'] = $guru->guru_id;
+        } else {
+            return redirect()->back()->with('error', 'Hanya guru BK yang dapat upload materi.');
+        }
         
         if ($request->hasFile('file_url')) {
             $file = $request->file('file_url');
@@ -76,7 +86,13 @@ class MateriBKController extends Controller
     public function edit(MateriBK $materi)
     {
         // Hanya creator atau admin yang bisa edit
-        if (Auth::user()->guru_id !== $materi->guru_id && Auth::user()->role !== 'admin') {
+        $user = Auth::user();
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if (!$guru || $guru->guru_id !== $materi->guru_id) {
+                abort(403);
+            }
+        } elseif ($user->role !== 'admin') {
             abort(403);
         }
         
@@ -89,7 +105,13 @@ class MateriBKController extends Controller
     public function update(Request $request, MateriBK $materi)
     {
         // Hanya creator atau admin yang bisa update
-        if (Auth::user()->guru_id !== $materi->guru_id && Auth::user()->role !== 'admin') {
+        $user = Auth::user();
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if (!$guru || $guru->guru_id !== $materi->guru_id) {
+                abort(403);
+            }
+        } elseif ($user->role !== 'admin') {
             abort(403);
         }
 
@@ -123,7 +145,13 @@ class MateriBKController extends Controller
     public function destroy(MateriBK $materi)
     {
         // Hanya creator atau admin yang bisa delete
-        if (Auth::user()->guru_id !== $materi->guru_id && Auth::user()->role !== 'admin') {
+        $user = Auth::user();
+        if ($user->role === 'guru_bk') {
+            $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
+            if (!$guru || $guru->guru_id !== $materi->guru_id) {
+                abort(403);
+            }
+        } elseif ($user->role !== 'admin') {
             abort(403);
         }
 
@@ -135,5 +163,17 @@ class MateriBKController extends Controller
 
         return redirect()->route('materi.index')
             ->with('success', 'Materi BK berhasil dihapus.');
+    }
+
+    /**
+     * Download file materi
+     */
+    public function download(MateriBK $materi)
+    {
+        if (!$materi->file_url || !Storage::disk('public')->exists($materi->file_url)) {
+            return redirect()->back()->with('error', 'File tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($materi->file_url);
     }
 }

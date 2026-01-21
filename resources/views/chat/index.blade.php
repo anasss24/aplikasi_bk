@@ -10,24 +10,75 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-md-4">
+        @if(!Auth::user()->hasRole('guru_bk'))
+        <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0 fw-bold">Daftar Percakapan</h5>
+                    <h5 class="mb-0 fw-bold">Chat</h5>
+                </div>
+                <div class="card-body p-0">
+                    @php
+                        $guruBK = \App\Models\GuruBK::with('user')->get();
+                    @endphp
+                    
+                    @if($guruBK->count() > 0)
+                        <div class="list-group list-group-flush">
+                            @foreach($guruBK as $guru)
+                                <a href="{{ route('chat.show', $guru->user->id) }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom hover-light" style="text-decoration: none; transition: all 0.3s ease;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 fw-semibold text-dark">{{ $guru->user->name }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-circle" style="color: #198754; font-size: 6px;"></i> Online
+                                            </small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-user-slash fa-2x mb-3 opacity-50"></i>
+                            <p>Belum ada guru BK</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @else
+        {{-- Untuk Guru BK: Tampilkan daftar user yang sudah chat --}}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-bold">Chat</h5>
                 </div>
                 <div class="card-body p-0">
                     @if($chats->count() > 0)
                         <div class="list-group list-group-flush">
                             @foreach($chats as $userId => $messages)
-                                <a href="{{ route('chat.show', $userId) }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">{{ $messages->first()->pengirim_id == Auth::id() ? $messages->first()->penerima->name : $messages->first()->pengirim->name }}</h6>
-                                            <p class="text-muted small mb-0 text-truncate">{{ $messages->first()->isi_pesan }}</p>
+                                @php
+                                    $otherUser = \App\Models\User::find($userId);
+                                @endphp
+                                @if($otherUser)
+                                    <a href="{{ route('chat.show', $userId) }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom hover-light" style="text-decoration: none; transition: all 0.3s ease;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-0 fw-semibold text-dark">{{ $otherUser->name }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-circle" style="color: #198754; font-size: 6px;"></i> Online
+                                                </small>
+                                            </div>
+                                            <i class="fas fa-chevron-right text-muted"></i>
                                         </div>
-                                        <small class="text-muted ms-2">{{ $messages->first()->waktu_kirim->format('H:i') }}</small>
-                                    </div>
-                                </a>
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     @else
@@ -39,15 +90,103 @@
                 </div>
             </div>
         </div>
+        @endif
 
-        <div class="col-md-8">
+        <div class="col-md-9">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center text-muted py-5">
-                    <i class="fas fa-comments fa-3x mb-3 opacity-25"></i>
-                    <p>Pilih percakapan untuk memulai chat</p>
+                <div class="card-header bg-white border-bottom">
+                    @php
+                        $headerTitle = 'Daftar Percakapan';
+                        if($chats->count() > 0) {
+                            $firstChat = collect($chats)->first();
+                            if($firstChat) {
+                                $firstUserId = collect($chats)->keys()->first();
+                                $firstUser = \App\Models\User::find($firstUserId);
+                                $headerTitle = $firstUser ? 'Percakapan dengan ' . $firstUser->name : 'Percakapan Aktif';
+                            }
+                        } else {
+                            $headerTitle = 'Belum Ada Percakapan';
+                        }
+                    @endphp
+                    <h5 class="mb-0 fw-bold">{{ $headerTitle }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if($chats->count() > 0)
+                        <div class="list-group list-group-flush">
+                            @foreach($chats as $userId => $messages)
+                                @php
+                                    $otherUser = \App\Models\User::find($userId);
+                                    $lastMessage = $messages->first();  // Ambil yang pertama (terbaru)
+                                    $unreadCount = $messages->where('penerima_id', Auth::id())->where('is_read', false)->count();
+                                @endphp
+                                
+                                @if($otherUser)
+                                    <a href="{{ route('chat.show', $userId) }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom hover-light" style="text-decoration: none; transition: all 0.3s ease;">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="mb-0 fw-semibold text-dark">{{ $otherUser->name }}</h6>
+                                            @if($unreadCount > 0)
+                                                <span class="badge bg-danger">{{ $unreadCount }}</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-muted small mb-0 text-truncate">
+                                            @if($lastMessage->pengirim_id == Auth::id())
+                                                <strong>Anda:</strong>
+                                            @endif
+                                            {{ $lastMessage->isi_pesan }}
+                                        </p>
+                                        <small class="text-muted d-block mt-2">
+                                            {{ $lastMessage->waktu_kirim->diffForHumans() }}
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-comments fa-2x mb-3 opacity-50"></i>
+                            <p>Tidak ada percakapan</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-light:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+<script>
+    // Real-time polling untuk update list chat
+    function refreshChatList() {
+        fetch('{{ route("chat.index") }}', {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Parse HTML untuk extract chat list
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newChatList = doc.querySelector('.list-group.list-group-flush');
+            const currentChatList = document.querySelector('.list-group.list-group-flush');
+            
+            if(newChatList && currentChatList) {
+                currentChatList.innerHTML = newChatList.innerHTML;
+            }
+        })
+        .catch(error => console.error('Error refreshing chat list:', error));
+    }
+
+    // Polling setiap 2 detik untuk update list
+    const chatListInterval = setInterval(refreshChatList, 2000);
+
+    // Cleanup saat halaman ditutup
+    window.addEventListener('unload', () => clearInterval(chatListInterval));
+</script>
+
 @endsection

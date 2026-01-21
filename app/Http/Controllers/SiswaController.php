@@ -6,7 +6,6 @@ use App\Models\Siswa;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class SiswaController extends Controller
 {
@@ -34,8 +33,8 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nis' => 'required|unique:siswa,nis',
-            'nisn' => 'nullable|unique:siswa,nisn',
+            'nis' => 'required|numeric|unique:siswa,nis|min:1|digits_between:1,20',
+            'nisn' => 'nullable|numeric|unique:siswa,nisn|min:1|digits_between:1,20',
             'nama_siswa' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'nullable|string',
@@ -44,16 +43,14 @@ class SiswaController extends Controller
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
             'kelas_id' => 'required|exists:kelas,kelas_id',
-            'status' => 'required|in:aktif,nonaktif',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'nis.numeric' => 'NIS harus berisi angka saja',
+            'nis.unique' => 'NIS sudah terdaftar dalam sistem',
+            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
+            'nisn.numeric' => 'NISN harus berisi angka saja',
+            'nisn.unique' => 'NISN sudah terdaftar dalam sistem',
+            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
         ]);
-
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/siswa', $filename);
-            $validated['foto'] = 'siswa/' . $filename;
-        }
 
         Siswa::create($validated);
 
@@ -85,8 +82,8 @@ class SiswaController extends Controller
     public function update(Request $request, Siswa $siswa)
     {
         $validated = $request->validate([
-            'nis' => 'required|unique:siswa,nis,' . $siswa->siswa_id . ',siswa_id',
-            'nisn' => 'nullable|unique:siswa,nisn,' . $siswa->siswa_id . ',siswa_id',
+            'nis' => 'required|numeric|unique:siswa,nis,' . $siswa->siswa_id . ',siswa_id|min:1|digits_between:1,20',
+            'nisn' => 'nullable|numeric|unique:siswa,nisn,' . $siswa->siswa_id . ',siswa_id|min:1|digits_between:1,20',
             'nama_siswa' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'nullable|string',
@@ -95,20 +92,14 @@ class SiswaController extends Controller
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
             'kelas_id' => 'required|exists:kelas,kelas_id',
-            'status' => 'required|in:aktif,nonaktif',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'nis.numeric' => 'NIS harus berisi angka saja',
+            'nis.unique' => 'NIS sudah terdaftar dalam sistem',
+            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
+            'nisn.numeric' => 'NISN harus berisi angka saja',
+            'nisn.unique' => 'NISN sudah terdaftar dalam sistem',
+            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
         ]);
-
-        if ($request->hasFile('foto')) {
-            // Delete old photo if exists
-            if ($siswa->foto) {
-                Storage::delete('public/' . $siswa->foto);
-            }
-            $file = $request->file('foto');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/siswa', $filename);
-            $validated['foto'] = 'siswa/' . $filename;
-        }
 
         $siswa->update($validated);
 
@@ -121,10 +112,6 @@ class SiswaController extends Controller
      */
     public function destroy(Siswa $siswa)
     {
-        if ($siswa->foto) {
-            Storage::delete('public/' . $siswa->foto);
-        }
-
         $siswa->delete();
 
         return redirect()->route('siswa.index')

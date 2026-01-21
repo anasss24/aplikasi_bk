@@ -34,8 +34,8 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nis' => 'nullable|string|unique:siswa,nis',
-            'nisn' => 'required|string|unique:siswa,nisn',
+            'nis' => 'nullable|numeric|unique:siswa,nis|min:1|digits_between:1,20',
+            'nisn' => 'required|numeric|unique:siswa,nisn|min:1|digits_between:1,20',
             'nama_siswa' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'tempat_lahir' => 'nullable|string|max:255',
@@ -44,11 +44,14 @@ class SiswaController extends Controller
             'no_telepon' => 'nullable|string|max:20',
             'email' => 'nullable|email|unique:siswa,email',
             'kelas_id' => 'required|exists:kelas,kelas_id',
-            'status' => 'nullable|in:aktif,tidak-aktif',
         ], [
+            'nis.numeric' => 'NIS harus berisi angka saja',
             'nis.unique' => 'NIS sudah terdaftar',
+            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
             'nisn.required' => 'NISN wajib diisi',
+            'nisn.numeric' => 'NISN harus berisi angka saja',
             'nisn.unique' => 'NISN sudah terdaftar',
+            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
             'nama_siswa.required' => 'Nama siswa wajib diisi',
             'kelas_id.required' => 'Kelas wajib dipilih',
             'kelas_id.exists' => 'Kelas tidak valid',
@@ -80,17 +83,24 @@ class SiswaController extends Controller
         $siswa = Siswa::findOrFail($id);
 
         $validated = $request->validate([
-            'nis' => 'nullable|string|unique:siswa,nis,' . $id,
-            'nisn' => 'required|string|unique:siswa,nisn,' . $id,
+            'nis' => 'nullable|numeric|unique:siswa,nis,' . $id . ',siswa_id|min:1|digits_between:1,20',
+            'nisn' => 'required|numeric|unique:siswa,nisn,' . $id . ',siswa_id|min:1|digits_between:1,20',
             'nama_siswa' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'alamat' => 'nullable|string',
             'no_telepon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:siswa,email,' . $id,
+            'email' => 'nullable|email|unique:siswa,email,' . $id . ',siswa_id',
             'kelas_id' => 'required|exists:kelas,kelas_id',
-            'status' => 'nullable|in:aktif,tidak-aktif',
+        ], [
+            'nis.numeric' => 'NIS harus berisi angka saja',
+            'nis.unique' => 'NIS sudah terdaftar',
+            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
+            'nisn.required' => 'NISN wajib diisi',
+            'nisn.numeric' => 'NISN harus berisi angka saja',
+            'nisn.unique' => 'NISN sudah terdaftar',
+            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
         ]);
 
         try {

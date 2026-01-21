@@ -110,11 +110,19 @@
           <div class="list-group list-group-flush">
             <div class="list-group-item">
               <small class="text-muted">Dibuat</small>
-              <p class="mb-0">{{ $riwayat->created_at->format('d F Y H:i') }}</p>
+              <p class="mb-0">
+                <span class="time-relative" data-timestamp="{{ $riwayat->created_at->timestamp }}">
+                  {{ $riwayat->created_at->format('d F Y H:i') }}
+                </span>
+              </p>
             </div>
             <div class="list-group-item">
               <small class="text-muted">Diperbarui</small>
-              <p class="mb-0">{{ $riwayat->updated_at->format('d F Y H:i') }}</p>
+              <p class="mb-0">
+                <span class="time-relative" data-timestamp="{{ $riwayat->updated_at->timestamp }}">
+                  {{ $riwayat->updated_at->format('d F Y H:i') }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -155,4 +163,62 @@
       margin-bottom: 0.25rem;
     }
   </style>
+
+  <script>
+    // Function to format relative time
+    function getRelativeTime(timestamp) {
+      const now = Math.floor(Date.now() / 1000); // Current time in seconds
+      const diff = now - timestamp;
+
+      if (diff < 60) {
+        return 'Baru saja';
+      } else if (diff < 3600) {
+        const minutes = Math.floor(diff / 60);
+        return minutes === 1 ? '1 menit yang lalu' : `${minutes} menit yang lalu`;
+      } else if (diff < 86400) {
+        const hours = Math.floor(diff / 3600);
+        return hours === 1 ? '1 jam yang lalu' : `${hours} jam yang lalu`;
+      } else if (diff < 604800) {
+        const days = Math.floor(diff / 86400);
+        return days === 1 ? '1 hari yang lalu' : `${days} hari yang lalu`;
+      } else if (diff < 2592000) {
+        const weeks = Math.floor(diff / 604800);
+        return weeks === 1 ? '1 minggu yang lalu' : `${weeks} minggu yang lalu`;
+      } else {
+        const months = Math.floor(diff / 2592000);
+        return months === 1 ? '1 bulan yang lalu' : `${months} bulan yang lalu`;
+      }
+    }
+
+    // Function to format full date time
+    function getFullDateTime(timestamp) {
+      const date = new Date(timestamp * 1000);
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+      return new Intl.DateTimeFormat('id-ID', options).format(date);
+    }
+
+    // Update relative times
+    function updateRelativeTime() {
+      document.querySelectorAll('.time-relative').forEach(element => {
+        const timestamp = parseInt(element.dataset.timestamp);
+        const relativeTime = getRelativeTime(timestamp);
+        const fullDateTime = getFullDateTime(timestamp);
+        element.textContent = relativeTime;
+        element.title = fullDateTime;
+      });
+    }
+
+    // Initial update
+    document.addEventListener('DOMContentLoaded', updateRelativeTime);
+
+    // Update every 30 seconds for accuracy
+    setInterval(updateRelativeTime, 30000);
+  </script>
 @endsection

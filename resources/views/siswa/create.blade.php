@@ -20,7 +20,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">NIS <span class="text-danger">*</span></label>
                                 <input type="text" name="nis" class="form-control @error('nis') is-invalid @enderror" 
-                                    value="{{ old('nis') }}" required>
+                                    value="{{ old('nis') }}" required pattern="[0-9]{1,10}" inputmode="numeric" maxlength="10">
                                 @error('nis')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
@@ -28,7 +28,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">NISN</label>
                                 <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror" 
-                                    value="{{ old('nisn') }}">
+                                    value="{{ old('nisn') }}" pattern="[0-9]{1,10}" inputmode="numeric" maxlength="10">
                                 @error('nisn')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
@@ -100,28 +100,6 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" class="form-control" value="{{ old('email') }}">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status <span class="text-danger">*</span></label>
-                                <select name="status" class="form-select @error('status') is-invalid @enderror" required>
-                                    <option value="">Pilih...</option>
-                                    <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                                </select>
-                                @error('status')
-                                    <span class="invalid-feedback">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Foto</label>
-                                <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror" 
-                                    accept="image/*">
-                                @error('foto')
-                                    <span class="invalid-feedback">{{ $message }}</span>
-                                @enderror
                             </div>
                         </div>
 
