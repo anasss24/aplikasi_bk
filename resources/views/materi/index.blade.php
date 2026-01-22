@@ -74,14 +74,22 @@
                 <a href="{{ route('materi.show', $m) }}" class="btn btn-outline-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;" title="Lihat">
                   <i class="fas fa-eye"></i>
                 </a>
-                @if(((Auth::user()->role ?? null) === 'guru_bk' && (Auth::user()->guru_id ?? null) === $m->guru_id) || (Auth::user()->role ?? null) === 'admin')
+                @php
+                  $currentUserGuruId = null;
+                  if ((Auth::user()->role ?? null) === 'guru_bk') {
+                    $guru = \App\Models\GuruBK::where('user_id', Auth::id())->first();
+                    $currentUserGuruId = $guru?->guru_id;
+                  }
+                  $canEdit = ((Auth::user()->role ?? null) === 'guru_bk' && $currentUserGuruId === $m->guru_id) || (Auth::user()->role ?? null) === 'admin';
+                @endphp
+                @if($canEdit)
                   <a href="{{ route('materi.edit', $m) }}" class="btn btn-primary" style="flex: 0 0 80px; display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;">
                     <i class="fas fa-edit me-2"></i> Edit
                   </a>
-                  <form action="{{ route('materi.destroy', $m) }}" method="POST" style="display:inline; width: 80px;">
+                  <form action="{{ route('materi.destroy', $m) }}" method="POST" style="display:inline; width: 80px;" class="delete-form">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin?')" style="display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;">
+                    <button type="submit" class="btn btn-danger w-100" style="display: flex; align-items: center; justify-content: center; padding: 6px 12px; height: 38px;" data-delete-message="Yakin ingin menghapus materi <strong>{{ $m->judul }}</strong>?">
                       <i class="fas fa-trash me-2"></i>Hapus
                     </button>
                   </form>
@@ -91,14 +99,6 @@
           </div>
         </div>
       @empty
-        <div class="col-12">
-          <div class="alert alert-info text-center py-4">
-            <i class="fas fa-info-circle"></i> Belum ada materi BK.
-            @if((Auth::user()->role ?? null) === 'guru_bk' || (Auth::user()->role ?? null) === 'admin')
-              <a href="{{ route('materi.create') }}">Unggah materi sekarang</a>
-            @endif
-          </div>
-        </div>
       @endforelse
     </div>
 

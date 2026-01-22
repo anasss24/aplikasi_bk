@@ -39,14 +39,16 @@ class HomeController extends Controller
             $siswa = Siswa::where('user_id', $user->id)->first();
             if ($siswa) {
                 $data['jadwalKonseling'] = JadwalKonseling::where('siswa_id', $siswa->id)
+                    ->where('status', '!=', 'selesai')
                     ->where('jadwal_datetime', '>=', Carbon::now())
                     ->with(['guru', 'siswa'])
                     ->orderBy('jadwal_datetime')
                     ->limit(5)
                     ->get();
 
+                // Get riwayat konseling via jadwal_konseling dan siswa_id
                 $data['riwayatKonseling'] = RiwayatKonseling::where('siswa_id', $siswa->id)
-                    ->with(['jadwal.guru', 'siswa'])
+                    ->with(['jadwal', 'guru'])
                     ->latest()
                     ->limit(5)
                     ->get();
@@ -55,8 +57,9 @@ class HomeController extends Controller
                     ->limit(6)
                     ->get();
 
-                $data['totalJadwal'] = JadwalKonseling::where('siswa_id', $siswa->id)->count();
+                $data['totalJadwal'] = JadwalKonseling::where('siswa_id', $siswa->id)->where('status', '!=', 'selesai')->count();
                 $data['totalRiwayat'] = RiwayatKonseling::where('siswa_id', $siswa->id)->count();
+                $data['totalMateri'] = MateriBK::count();
             }
             return view('dashboard.siswa', $data);
         } elseif ($user->role === 'guru_bk') {
@@ -65,6 +68,7 @@ class HomeController extends Controller
                 $data['totalSiswa'] = Siswa::whereHas('kelas')->count();
 
                 $data['jadwalHariIni'] = JadwalKonseling::where('guru_id', $guru->guru_id)
+                    ->where('status', '!=', 'selesai')
                     ->whereDate('jadwal_datetime', Carbon::today())
                     ->with(['siswa'])
                     ->orderBy('jadwal_datetime')
@@ -81,6 +85,8 @@ class HomeController extends Controller
                     ->count();
 
                 $data['totalRiwayat'] = RiwayatKonseling::where('created_by', $guru->guru_id)->count();
+                $data['totalJadwal'] = JadwalKonseling::where('guru_id', $guru->guru_id)->where('status', '!=', 'selesai')->count();
+                $data['totalMateri'] = MateriBK::where('guru_id', $guru->guru_id)->count();
             }
             return view('dashboard.guru_bk', $data);
         } elseif ($user->role === 'admin') {

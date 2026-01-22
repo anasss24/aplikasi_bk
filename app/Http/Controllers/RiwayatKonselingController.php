@@ -19,9 +19,13 @@ class RiwayatKonselingController extends Controller
         
         if ($user->role === 'siswa') {
             // Siswa hanya bisa lihat riwayat konseling mereka sendiri
-            $riwayat = RiwayatKonseling::whereHas('jadwal', function ($query) use ($user) {
-                $query->where('siswa_id', $user->siswa_id ?? null);
-            })->with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
+            $siswa = \App\Models\Siswa::where('user_id', $user->id)->first();
+            if ($siswa) {
+                $riwayat = RiwayatKonseling::where('siswa_id', $siswa->id)
+                    ->with(['jadwal.siswa', 'jadwal.guru', 'guru'])->paginate(15);
+            } else {
+                $riwayat = collect([]);
+            }
         } else if ($user->role === 'guru_bk') {
             // Guru BK lihat riwayat konseling yang mereka tangani
             $guru = \App\Models\GuruBK::where('user_id', $user->id)->first();
@@ -87,8 +91,11 @@ class RiwayatKonselingController extends Controller
         }
         
         $jadwals = $query->get();
+        
+        // Jika dari chat (ada jadwal_id), set sebagai "konseling online"
+        $isFromChat = $jadwal_id ? true : false;
             
-        return view('riwayat.create', compact('jadwals', 'jadwal_id', 'selectedJadwal', 'siswa'));
+        return view('riwayat.create', compact('jadwals', 'jadwal_id', 'selectedJadwal', 'siswa', 'isFromChat'));
     }
 
     /**
@@ -127,10 +134,19 @@ class RiwayatKonselingController extends Controller
         }
 
         try {
-            RiwayatKonseling::create($validated);
+            $riwayat = RiwayatKonseling::create($validated);
+
+            // Jika ada jadwal_id, update status jadwal menjadi selesai
+            if ($request->has('jadwal_id') && $request->jadwal_id) {
+                $jadwal = JadwalKonseling::find($request->jadwal_id);
+                if ($jadwal) {
+                    $jadwal->status = 'selesai';
+                    $jadwal->save();
+                }
+            }
 
             return redirect()->route('riwayat.index')
-                ->with('success', 'Riwayat konseling berhasil dicatat.');
+                ->with('success', 'Riwayat konseling berhasil dicatat dan jadwal konseling ditandai selesai.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menyimpan riwayat: ' . $e->getMessage())

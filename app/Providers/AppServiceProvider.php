@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
+use App\Rules\RecaptchaRule;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Validator::extend('recaptcha', function ($attribute, $value, $parameters, $validator) {
+            return (new RecaptchaRule())->passes($attribute, $value);
+        }, 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.');
     }
 }

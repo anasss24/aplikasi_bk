@@ -18,6 +18,7 @@ class JadwalController extends Controller
             $guru = GuruBK::where('user_id', $user->id)->first();
             if ($guru) {
                 $jadwals = JadwalKonseling::where('guru_id', $guru->guru_id)
+                    ->where('status', '!=', 'selesai')
                     ->with(['siswa','guru','approvedBy'])
                     ->orderBy('jadwal_datetime','desc')
                     ->paginate(15);
@@ -25,8 +26,9 @@ class JadwalController extends Controller
                 $jadwals = collect([]);
             }
         } else {
-            // Admin dan user/siswa lihat semua jadwal
-            $jadwals = JadwalKonseling::with(['siswa','guru','approvedBy'])
+            // Admin dan user/siswa lihat semua jadwal kecuali yang selesai
+            $jadwals = JadwalKonseling::where('status', '!=', 'selesai')
+                ->with(['siswa','guru','approvedBy'])
                 ->orderBy('jadwal_datetime','desc')
                 ->paginate(15);
         }

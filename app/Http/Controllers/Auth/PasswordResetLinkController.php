@@ -21,44 +21,38 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Handle an incoming password reset link request dengan OTP.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle an incoming password reset request dengan OTP.
      */
     public function store(Request $request): RedirectResponse
     {
-        \Log::info('DEBUG: POST /forgot-password called', ['email' => $request->email]);
-        
         $request->validate([
             'email' => ['required', 'email', 'exists:users'],
+            'g-recaptcha-response' => ['required', 'recaptcha'],
+        ], [
+            'g-recaptcha-response.required' => 'Silakan verifikasi reCAPTCHA.',
+            'g-recaptcha-response.recaptcha' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
         ]);
 
         $user = User::where('email', $request->email)->first();
-        \Log::info('DEBUG: User found', ['email' => $request->email, 'user_id' => $user?->id]);
         
         if (!$user) {
-            \Log::warning('DEBUG: User not found', ['email' => $request->email]);
             return back()->withErrors(['email' => 'Email tidak ditemukan dalam sistem.']);
         }
 
         // Generate OTP
         $otpCode = $user->generateOtp();
-        \Log::info('DEBUG: OTP generated', ['otp' => $otpCode, 'expires' => $user->otp_expires_at]);
 
         // Send OTP ke email
         try {
             Mail::to($user->email)->send(new OtpVerificationMail($otpCode, $user->name));
-            \Log::info('DEBUG: Email sent successfully');
         } catch (\Exception $e) {
-            \Log::error('DEBUG: Email sending failed', ['error' => $e->getMessage()]);
+            \Log::error('Failed to send OTP email', ['error' => $e->getMessage()]);
             return back()->withErrors(['email' => 'Gagal mengirim OTP ke email. Silakan coba lagi.']);
         }
 
         // Store email di session untuk verifikasi OTP
         session()->put('reset_email', $request->email);
-        \Log::info('DEBUG: Session set', ['reset_email' => $request->email]);
 
-        \Log::info('DEBUG: About to redirect to password.verify-otp');
         return redirect()->route('password.verify-otp')
                         ->with('status', 'OTP telah dikirim ke email Anda. Silakan cek email untuk kode OTP.');
     }

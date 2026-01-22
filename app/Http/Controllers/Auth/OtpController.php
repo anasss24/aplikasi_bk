@@ -39,12 +39,8 @@ class OtpController extends Controller
             return redirect('/login')->with('error', 'User tidak ditemukan.');
         }
 
-        if (!$user->isOtpValid()) {
-            return redirect('/verify-otp')->with('error', 'Kode OTP telah kadaluarsa. Silakan request OTP baru.');
-        }
-
-        if ($user->otp_code !== $request->otp_code) {
-            return redirect('/verify-otp')->with('error', 'Kode OTP tidak valid.');
+        if (!$user->isOtpValid($request->otp_code)) {
+            return redirect('/verify-otp')->with('error', 'Kode OTP tidak valid atau telah kadaluarsa.');
         }
 
         // Verifikasi berhasil

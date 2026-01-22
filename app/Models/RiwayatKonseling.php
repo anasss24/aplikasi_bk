@@ -6,13 +6,13 @@ class RiwayatKonseling extends Model
 {
     protected $table = 'riwayat_konseling';
     protected $primaryKey = 'riwayat_id';
+    protected $keyType = 'int';
     public $timestamps = true;
     protected $casts = [
         'tanggal_riwayat' => 'date',
         'tanggal_follow_up' => 'date',
     ];
     protected $fillable = [
-        'riwayat_id',
         'siswa_id',
         'guru_id',
         'tanggal_riwayat',

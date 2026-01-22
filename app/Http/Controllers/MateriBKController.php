@@ -35,9 +35,7 @@ class MateriBKController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'kategori' => 'required|in:kelas10,kelas11,kelas12,umum',
-            'file_url' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png|max:10240',
-            'url_eksternal' => 'nullable|url',
+            'kategori' => 'required|in:kelas10,kelas11,kelas12',
             'tanggal_upload' => 'nullable|date',
         ]);
 
@@ -52,21 +50,14 @@ class MateriBKController extends Controller
         } else {
             return redirect()->back()->with('error', 'Hanya guru BK yang dapat upload materi.');
         }
-        
-        if ($request->hasFile('file_url')) {
-            $file = $request->file('file_url');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/materi', $filename);
-            $validated['file_url'] = 'materi/' . $filename;
-        }
 
         if (!isset($validated['tanggal_upload'])) {
             $validated['tanggal_upload'] = now()->toDateString();
         }
 
-        MateriBK::create($validated);
+        $materi = MateriBK::create($validated);
 
-        return redirect()->route('materi.index')
+        return redirect()->route('materi.show', $materi)
             ->with('success', 'Materi BK berhasil ditambahkan.');
     }
 
@@ -118,20 +109,8 @@ class MateriBKController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'kategori' => 'required|in:kelas10,kelas11,kelas12,umum',
-            'file_url' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png|max:10240',
-            'url_eksternal' => 'nullable|url',
+            'kategori' => 'required|in:kelas10,kelas11,kelas12',
         ]);
-
-        if ($request->hasFile('file_url')) {
-            if ($materi->file_url) {
-                Storage::delete('public/' . $materi->file_url);
-            }
-            $file = $request->file('file_url');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/materi', $filename);
-            $validated['file_url'] = 'materi/' . $filename;
-        }
 
         $materi->update($validated);
 
@@ -153,10 +132,6 @@ class MateriBKController extends Controller
             }
         } elseif ($user->role !== 'admin') {
             abort(403);
-        }
-
-        if ($materi->file_url) {
-            Storage::delete('public/' . $materi->file_url);
         }
 
         $materi->delete();

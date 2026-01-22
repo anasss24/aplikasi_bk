@@ -80,10 +80,39 @@
                         <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" placeholder="Ulangi password Anda" required>
                         @error('password_confirmation')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
+                    <div class="mb-3">
+                        <label for="nis" class="form-label">NIS (Nomor Induk Siswa)</label>
+                        <input type="text" class="form-control @error('nis') is-invalid @enderror" id="nis" name="nis" value="{{ old('nis') }}" placeholder="Masukkan NIS Anda (10 angka)" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+                        @error('nis')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="nisn" class="form-label">NISN (Nomor Induk Siswa Nasional)</label>
+                        <input type="text" class="form-control @error('nisn') is-invalid @enderror" id="nisn" name="nisn" value="{{ old('nisn') }}" placeholder="Masukkan NISN Anda (10 angka)" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+                        @error('nisn')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    </div>
+
+                    <!-- reCAPTCHA -->
+                    <div class="mb-3">
+                        <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                        @error('g-recaptcha-response')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
+                    </div>
+
                     <button type="submit" class="btn btn-register w-100"><i class="fas fa-user-check"></i> Buat Akun</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        // Hanya izinkan angka untuk NIS dan NISN
+        document.getElementById('nis').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        document.getElementById('nisn').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>

@@ -150,4 +150,32 @@ class ChatController extends Controller
             })
         ]);
     }
+
+    /**
+     * Selesai konseling - redirect ke form hasil konseling
+     */
+    public function selesai($userId)
+    {
+        $currentUser = Auth::user();
+
+        // Hanya guru BK yang bisa menyelesaikan konseling
+        if (!$currentUser->hasRole('guru_bk')) {
+            return redirect()->back()->with('error', 'Hanya guru BK yang dapat menyelesaikan konseling');
+        }
+
+        // Cari jadwal konseling yang sedang berlangsung antara guru ini dan siswa
+        $siswa = User::findOrFail($userId);
+        $jadwal = \App\Models\JadwalKonseling::where('guru_id', $currentUser->guru->guru_id)
+            ->where('siswa_id', $siswa->siswa->id ?? null)
+            ->where('status', 'disetujui')
+            ->latest()
+            ->first();
+
+        if (!$jadwal) {
+            return redirect()->back()->with('error', 'Jadwal konseling tidak ditemukan atau sudah selesai');
+        }
+
+        // Redirect ke form hasil konseling dengan membawa jadwal_id
+        return redirect()->route('riwayat.create', ['jadwal_id' => $jadwal->jadwal_id])->with('success', 'Silakan isi form hasil konseling');
+    }
 }

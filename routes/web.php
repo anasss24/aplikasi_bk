@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{userId}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    Route::post('/chat/{userId}/selesai', [ChatController::class, 'selesai'])->name('chat.selesai');
     Route::get('/api/chat/{userId}/messages', [ChatController::class, 'getMessages']);
     
     // Self Assessment

@@ -63,9 +63,6 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('jadwal.show', $jadwal->jadwal_id) }}" class="btn btn-sm btn-info" title="Lihat">
-                                    <i class="fas fa-eye"></i>
-                                </a>
                                 {{-- Untuk Guru BK: Tombol Setuju dan Tolak --}}
                                 @if(auth()->user()->role === 'guru_bk' && $jadwal->status === 'diajukan')
                                     <form action="{{ route('jadwal.approve', $jadwal->jadwal_id) }}" method="POST" style="display:inline;">
@@ -89,6 +86,24 @@
                                             <i class="fas fa-trash"></i> Batalkan
                                         </button>
                                     </form>
+                                @endif
+                                {{-- Tombol Mulai Chat --}}
+                                @php
+                                    $statusCheck = strtolower(trim($jadwal->status ?? ''));
+                                    if($statusCheck === 'disetujui') {
+                                        if(auth()->user()->role === 'siswa') {
+                                            $chatTargetUserId = $jadwal->guru?->user_id;
+                                        } else {
+                                            $chatTargetUserId = $jadwal->siswa?->user_id;
+                                        }
+                                    } else {
+                                        $chatTargetUserId = null;
+                                    }
+                                @endphp
+                                @if($chatTargetUserId)
+                                    <a href="{{ route('chat.show', $chatTargetUserId) }}" class="btn btn-sm btn-primary" title="Mulai Chat">
+                                        <i class="fas fa-comments"></i> Chat
+                                    </a>
                                 @endif
                             </td>
                         </tr>

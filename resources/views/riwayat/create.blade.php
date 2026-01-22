@@ -15,6 +15,10 @@
           <div class="card-body p-4">
             <form action="{{ route('riwayat.store') }}" method="POST" enctype="multipart/form-data">
               @csrf
+              
+              @if($jadwal_id)
+                <input type="hidden" name="jadwal_id" value="{{ $jadwal_id }}">
+              @endif
 
               {{-- Informasi Dasar --}}
               <div class="mb-4">
@@ -23,7 +27,7 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Siswa <span class="text-danger">*</span></label>
-                    <select name="siswa_id" class="form-select @error('siswa_id') is-invalid @enderror" required>
+                    <select name="siswa_id" class="form-select @error('siswa_id') is-invalid @enderror" required @if($selectedJadwal) disabled @endif>
                       <option value="">-- Pilih Siswa --</option>
                       @foreach($siswa as $s)
                         <option value="{{ $s->id }}" {{ old('siswa_id', $selectedJadwal->siswa_id ?? '') == $s->id ? 'selected' : '' }}>
@@ -31,6 +35,9 @@
                         </option>
                       @endforeach
                     </select>
+                    @if($selectedJadwal)
+                      <input type="hidden" name="siswa_id" value="{{ $selectedJadwal->siswa_id }}">
+                    @endif
                     @error('siswa_id')
                       <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -50,7 +57,10 @@
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Waktu Mulai <span class="text-danger">*</span></label>
                     <input type="time" name="waktu_mulai" class="form-control @error('waktu_mulai') is-invalid @enderror" 
-                      value="{{ old('waktu_mulai') }}" required>
+                      value="{{ old('waktu_mulai', $selectedJadwal?->jadwal_datetime?->format('H:i') ?? '') }}" required @if($selectedJadwal) disabled @endif>
+                    @if($selectedJadwal)
+                      <input type="hidden" name="waktu_mulai" value="{{ $selectedJadwal->jadwal_datetime->format('H:i') }}">
+                    @endif
                     @error('waktu_mulai')
                       <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -76,17 +86,34 @@
 
                 <div class="mb-3">
                   <label class="form-label">Topik/Masalah yang Dibahas <span class="text-danger">*</span></label>
-                  <select name="topik" class="form-select @error('topik') is-invalid @enderror" required>
+                  @php
+                    $masalahToTopikMap = [
+                      'masalah_akademik' => 'Akademik',
+                      'masalah_keluarga' => 'Keluarga',
+                      'masalah_sosial' => 'Sosial',
+                      'masalah_emosional' => 'Pribadi',
+                      'masalah_karir' => 'Karir',
+                      'masalah_pribadi' => 'Pribadi',
+                      'masalah_kesehatan' => 'Pribadi',
+                      'masalah_disiplin' => 'Perilaku',
+                      'lainnya' => 'Lainnya',
+                    ];
+                    $autoSelectedTopik = $selectedJadwal ? ($masalahToTopikMap[$selectedJadwal->masalah] ?? '') : old('topik');
+                  @endphp
+                  <select name="topik" class="form-select @error('topik') is-invalid @enderror" required @if($selectedJadwal) disabled @endif>
                     <option value="">-- Pilih Topik --</option>
-                    <option value="Akademik" {{ old('topik') == 'Akademik' ? 'selected' : '' }}>Akademik</option>
-                    <option value="Pribadi" {{ old('topik') == 'Pribadi' ? 'selected' : '' }}>Pribadi</option>
-                    <option value="Sosial" {{ old('topik') == 'Sosial' ? 'selected' : '' }}>Sosial</option>
-                    <option value="Perilaku" {{ old('topik') == 'Perilaku' ? 'selected' : '' }}>Perilaku</option>
-                    <option value="Karir" {{ old('topik') == 'Karir' ? 'selected' : '' }}>Karir</option>
-                    <option value="Bullying/Kekerasan" {{ old('topik') == 'Bullying/Kekerasan' ? 'selected' : '' }}>Bullying/Kekerasan</option>
-                    <option value="Keluarga" {{ old('topik') == 'Keluarga' ? 'selected' : '' }}>Keluarga</option>
-                    <option value="Lainnya" {{ old('topik') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    <option value="Akademik" {{ $autoSelectedTopik == 'Akademik' ? 'selected' : '' }}>Akademik</option>
+                    <option value="Pribadi" {{ $autoSelectedTopik == 'Pribadi' ? 'selected' : '' }}>Pribadi</option>
+                    <option value="Sosial" {{ $autoSelectedTopik == 'Sosial' ? 'selected' : '' }}>Sosial</option>
+                    <option value="Perilaku" {{ $autoSelectedTopik == 'Perilaku' ? 'selected' : '' }}>Perilaku</option>
+                    <option value="Karir" {{ $autoSelectedTopik == 'Karir' ? 'selected' : '' }}>Karir</option>
+                    <option value="Bullying/Kekerasan" {{ $autoSelectedTopik == 'Bullying/Kekerasan' ? 'selected' : '' }}>Bullying/Kekerasan</option>
+                    <option value="Keluarga" {{ $autoSelectedTopik == 'Keluarga' ? 'selected' : '' }}>Keluarga</option>
+                    <option value="Lainnya" {{ $autoSelectedTopik == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                   </select>
+                  @if($selectedJadwal)
+                    <input type="hidden" name="topik" value="{{ $autoSelectedTopik }}">
+                  @endif
                   @error('topik')
                     <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
@@ -95,11 +122,14 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Metode Konseling <span class="text-danger">*</span></label>
-                    <select name="metode" class="form-select @error('metode') is-invalid @enderror" required>
+                    <select name="metode" class="form-select @error('metode') is-invalid @enderror" required @if($isFromChat) disabled @endif>
                       <option value="">-- Pilih Metode --</option>
-                      <option value="tatap_muka" {{ old('metode') == 'tatap_muka' ? 'selected' : '' }}>Tatap Muka</option>
-                      <option value="online" {{ old('metode') == 'online' ? 'selected' : '' }}>Online</option>
+                      <option value="tatap_muka" {{ old('metode', 'tatap_muka') == 'tatap_muka' ? 'selected' : '' }}>Tatap Muka</option>
+                      <option value="online" {{ old('metode', $isFromChat ? 'online' : '') == 'online' ? 'selected' : '' }}>Online</option>
                     </select>
+                    @if($isFromChat)
+                      <input type="hidden" name="metode" value="online">
+                    @endif
                     @error('metode')
                       <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -107,11 +137,14 @@
 
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Lokasi Konseling</label>
-                    <select name="lokasi" class="form-select">
+                    <select name="lokasi" class="form-select" @if($isFromChat) disabled @endif>
                       <option value="">-- Pilih Lokasi --</option>
                       <option value="ruang_bk" {{ old('lokasi') == 'ruang_bk' ? 'selected' : '' }}>Ruang BK</option>
-                      <option value="chat" {{ old('lokasi') == 'chat' ? 'selected' : '' }}>Chat</option>
+                      <option value="chat" {{ old('lokasi', $isFromChat ? 'chat' : '') == 'chat' ? 'selected' : '' }}>Chat</option>
                     </select>
+                    @if($isFromChat)
+                      <input type="hidden" name="lokasi" value="chat">
+                    @endif
                   </div>
                 </div>
               </div>

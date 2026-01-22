@@ -12,6 +12,13 @@
           <a href="{{ route('materi.edit', $materi) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Edit
           </a>
+          <form action="{{ route('materi.destroy', $materi) }}" method="POST" style="display:inline;" class="delete-form">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger" data-delete-message="Yakin ingin menghapus materi <strong>{{ $materi->judul }}</strong>? Data ini akan dihapus secara permanen.">
+              <i class="fas fa-trash"></i> Hapus
+            </button>
+          </form>
         @endif
         <a href="{{ route('materi.index') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i> Kembali
@@ -46,23 +53,7 @@
             <h5>Deskripsi</h5>
             <p style="white-space: pre-wrap;">{{ $materi->deskripsi }}</p>
 
-            @if($materi->file_url)
-              <div class="mt-4">
-                <h5 class="mb-3">File Materi</h5>
-                <a href="{{ route('materi.download', $materi) }}" class="btn btn-lg btn-primary">
-                  <i class="fas fa-download"></i> Download Materi
-                </a>
-              </div>
-            @endif
 
-            @if($materi->url_eksternal)
-              <div class="mt-3">
-                <h5 class="mb-3">Akses Eksternal</h5>
-                <a href="{{ $materi->url_eksternal }}" class="btn btn-lg btn-info" target="_blank">
-                  <i class="fas fa-external-link-alt"></i> Buka Link Eksternal
-                </a>
-              </div>
-            @endif
           </div>
         </div>
       </div>

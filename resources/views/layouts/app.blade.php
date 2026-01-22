@@ -747,13 +747,6 @@
                         </a>
                     </li>
 
-                    <li class="menu-label">Lainnya</li>
-                    <li>
-                        <a href="{{ route('chat.index') }}" class="@if(request()->routeIs('chat.*')) active @endif">
-                            <i class="fas fa-comments"></i>
-                            <span>Chat</span>
-                        </a>
-                    </li>
                 @elseif((Auth::user()->role ?? null) === 'guru_bk')
                     <li class="menu-label">Manajemen</li>
                     <li>
@@ -783,13 +776,6 @@
                         </a>
                     </li>
 
-                    <li class="menu-label">Lainnya</li>
-                    <li>
-                        <a href="{{ route('chat.index') }}" class="@if(request()->routeIs('chat.*')) active @endif">
-                            <i class="fas fa-comments"></i>
-                            <span>Chat</span>
-                        </a>
-                    </li>
                 @elseif((Auth::user()->role ?? null) === 'admin')
                     <li class="menu-label">Manajemen</li>
                     <li>

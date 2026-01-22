@@ -20,63 +20,69 @@
     <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
+            <a href="{{ route('jadwal.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="cursor: pointer; transition: all 0.3s ease;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-2 fw-semibold">Jadwal Konseling</p>
+                                <h3 class="fw-bold mb-0" style="color: #0099C9;">{{ $totalJadwal ?? 0 }}</h3>
+                            </div>
+                            <div style="width: 50px; height: 50px; background: rgba(0, 153, 201, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-calendar-check" style="color: #0099C9; font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{{ route('riwayat.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="cursor: pointer; transition: all 0.3s ease;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-2 fw-semibold">Total Konseling</p>
+                                <h3 class="fw-bold mb-0" style="color: #0077B6;">{{ $totalRiwayat ?? 0 }}</h3>
+                            </div>
+                            <div style="width: 50px; height: 50px; background: rgba(0, 119, 182, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-history" style="color: #0077B6; font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{{ route('materi.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="cursor: pointer; transition: all 0.3s ease;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-2 fw-semibold">Materi Upload</p>
+                                <h3 class="fw-bold mb-0" style="color: #0099C9;">{{ $totalMateri ?? 0 }}</h3>
+                            </div>
+                            <div style="width: 50px; height: 50px; background: rgba(0, 153, 201, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-book" style="color: #0099C9; font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-muted small mb-2 fw-semibold">Total Siswa</p>
-                            <h3 class="fw-bold mb-0" style="color: #0099C9;">{{ $totalSiswa ?? 0 }}</h3>
-                        </div>
-                        <div style="width: 50px; height: 50px; background: rgba(0, 153, 201, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-graduation-cap" style="color: #0099C9; font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted small mb-2 fw-semibold">Jadwal Hari Ini</p>
-                            <h3 class="fw-bold mb-0" style="color: #0077B6;">{{ count($jadwalHariIni ?? []) }}</h3>
+                            <h3 class="fw-bold mb-0" style="color: #0077B6;">{{ $totalSiswa ?? 0 }}</h3>
                         </div>
                         <div style="width: 50px; height: 50px; background: rgba(0, 119, 182, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-calendar-check" style="color: #0077B6; font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted small mb-2 fw-semibold">Total Konseling</p>
-                            <h3 class="fw-bold mb-0" style="color: #0099C9;">{{ $totalRiwayat ?? 0 }}</h3>
-                        </div>
-                        <div style="width: 50px; height: 50px; background: rgba(0, 153, 201, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-chart-line" style="color: #0099C9; font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted small mb-2 fw-semibold">Materi Upload</p>
-                            <h3 class="fw-bold mb-0" style="color: #0077B6;">{{ $materiDiupload ?? 0 }}</h3>
-                        </div>
-                        <div style="width: 50px; height: 50px; background: rgba(0, 119, 182, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-book" style="color: #0077B6; font-size: 1.5rem;"></i>
+                            <i class="fas fa-graduation-cap" style="color: #0077B6; font-size: 1.5rem;"></i>
                         </div>
                     </div>
                 </div>
@@ -91,7 +97,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold mb-0">Jadwal Konseling Hari Ini</h6>
-                    <a href="{{ route('jadwal.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                    <a href="{{ route('jadwal.index') }}" class="btn btn-sm" style="background-color: #0099C9; color: white; font-weight: 600;">Lihat Semua</a>
                 </div>
                 <div class="card-body p-0">
                     @forelse($jadwalHariIni ?? [] as $jadwal)
@@ -103,7 +109,9 @@
                                     {{ $jadwal->jadwal_datetime->format('H:i') ?? '-' }}
                                 </small>
                                 @if($jadwal->status)
-                                    <span class="badge bg-success mt-2">{{ $jadwal->status }}</span>
+                                    <a href="{{ route('jadwal.index') }}" class="badge bg-success mt-2" style="cursor: pointer; text-decoration: none;">
+                                        {{ $jadwal->status }}
+                                    </a>
                                 @endif
                             </div>
                         </div>
@@ -168,7 +176,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold mb-0">Riwayat Konseling Bulan Ini</h6>
-                    <a href="{{ route('riwayat.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                    <a href="{{ route('riwayat.index') }}" class="btn btn-sm" style="background-color: #0099C9; color: white; font-weight: 600;">Lihat Semua</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

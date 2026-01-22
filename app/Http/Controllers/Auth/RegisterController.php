@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Siswa;
 use App\Mail\OtpVerificationMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -24,6 +25,16 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'nis' => ['required', 'digits:10', 'unique:siswa,nis'],
+            'nisn' => ['required', 'digits:10', 'unique:siswa,nisn'],
+            'g-recaptcha-response' => ['required', 'recaptcha'],
+        ], [
+            'nis.digits' => 'NIS harus terdiri dari 10 angka',
+            'nis.unique' => 'NIS sudah terdaftar',
+            'nisn.digits' => 'NISN harus terdiri dari 10 angka',
+            'nisn.unique' => 'NISN sudah terdaftar',
+            'g-recaptcha-response.required' => 'Silakan verifikasi reCAPTCHA.',
+            'g-recaptcha-response.recaptcha' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
         ]);
     }
 
@@ -35,6 +46,21 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'is_verified' => false,  // Belum verified, harus verifikasi OTP dulu
             'role' => 'siswa'  // Default role untuk register adalah siswa
+        ]);
+
+        // Otomatis tambahkan ke tabel siswa
+        Siswa::create([
+            'user_id' => $user->id,
+            'nis' => $data['nis'],
+            'nisn' => $data['nisn'],
+            'nama_siswa' => $data['name'],
+            'jenis_kelamin' => 'L',
+            'tempat_lahir' => '-',
+            'tanggal_lahir' => now()->subYears(15),
+            'alamat' => '-',
+            'no_telepon' => '-',
+            'email' => $data['email'],
+            'kelas_id' => 1,
         ]);
 
         return $user;

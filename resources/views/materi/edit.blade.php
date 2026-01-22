@@ -46,7 +46,6 @@
                     </option>
                     <option value="kelas12" {{ old('kategori', $materi->kategori) == 'kelas12' ? 'selected' : '' }}>Kelas 12
                     </option>
-                    <option value="umum" {{ old('kategori', $materi->kategori) == 'umum' ? 'selected' : '' }}>Umum</option>
                   </select>
                   @error('kategori')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -54,29 +53,7 @@
                 </div>
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">File Materi</label>
-                @if($materi->file_url)
-                  <div class="mb-2">
-                    <a href="{{ asset('storage/' . $materi->file_url) }}" target="_blank"
-                      class="btn btn-sm btn-outline-primary">
-                      <i class="fas fa-download"></i> Lihat File Saat Ini
-                    </a>
-                  </div>
-                @endif
-                <input type="file" name="file_url" class="form-control @error('file_url') is-invalid @enderror"
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png">
-                <small class="text-muted">Format: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG (Max 10MB)</small>
-                @error('file_url')
-                  <span class="invalid-feedback d-block">{{ $message }}</span>
-                @enderror
-              </div>
 
-              <div class="mb-3">
-                <label class="form-label">URL Eksternal (Opsional)</label>
-                <input type="url" name="url_eksternal" class="form-control"
-                  value="{{ old('url_eksternal', $materi->url_eksternal) }}">
-              </div>
 
               <div class="form-group d-flex gap-2">
                 <a href="{{ route('materi.show', $materi) }}" class="btn btn-danger" style="padding: 8px 24px; font-weight: 500; min-width: 100px; height: 40px; display: flex; align-items: center; justify-content: center;">

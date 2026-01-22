@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
-use App\Models\Kelas;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
@@ -15,7 +13,7 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $siswa = Siswa::with(['kelas', 'user'])->latest()->get();
+        $siswa = Siswa::paginate(15);
         return view('admin.siswa.index', compact('siswa'));
     }
 
@@ -24,8 +22,7 @@ class SiswaController extends Controller
      */
     public function create()
     {
-        $kelas = Kelas::all();
-        return view('admin.siswa.create', compact('kelas'));
+        return view('admin.siswa.create');
     }
 
     /**
@@ -33,95 +30,38 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nis' => 'nullable|numeric|unique:siswa,nis|min:1|digits_between:1,20',
-            'nisn' => 'required|numeric|unique:siswa,nisn|min:1|digits_between:1,20',
-            'nama_siswa' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
-            'tempat_lahir' => 'nullable|string|max:255',
-            'tanggal_lahir' => 'nullable|date',
-            'alamat' => 'nullable|string',
-            'no_telepon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:siswa,email',
-            'kelas_id' => 'required|exists:kelas,kelas_id',
-        ], [
-            'nis.numeric' => 'NIS harus berisi angka saja',
-            'nis.unique' => 'NIS sudah terdaftar',
-            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
-            'nisn.required' => 'NISN wajib diisi',
-            'nisn.numeric' => 'NISN harus berisi angka saja',
-            'nisn.unique' => 'NISN sudah terdaftar',
-            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
-            'nama_siswa.required' => 'Nama siswa wajib diisi',
-            'kelas_id.required' => 'Kelas wajib dipilih',
-            'kelas_id.exists' => 'Kelas tidak valid',
-        ]);
+        //
+    }
 
-        try {
-            Siswa::create($validated);
-            return redirect('/admin/siswa')->with('success', 'Data siswa berhasil ditambahkan');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menambahkan data siswa: ' . $e->getMessage());
-        }
+    /**
+     * Display the specified resource.
+     */
+    public function show(Siswa $siswa)
+    {
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Siswa $siswa)
     {
-        $siswa = Siswa::findOrFail($id);
-        $kelas = Kelas::all();
-        return view('admin.siswa.edit', compact('siswa', 'kelas'));
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Siswa $siswa)
     {
-        $siswa = Siswa::findOrFail($id);
-
-        $validated = $request->validate([
-            'nis' => 'nullable|numeric|unique:siswa,nis,' . $id . ',siswa_id|min:1|digits_between:1,20',
-            'nisn' => 'required|numeric|unique:siswa,nisn,' . $id . ',siswa_id|min:1|digits_between:1,20',
-            'nama_siswa' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
-            'tempat_lahir' => 'nullable|string|max:255',
-            'tanggal_lahir' => 'nullable|date',
-            'alamat' => 'nullable|string',
-            'no_telepon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:siswa,email,' . $id . ',siswa_id',
-            'kelas_id' => 'required|exists:kelas,kelas_id',
-        ], [
-            'nis.numeric' => 'NIS harus berisi angka saja',
-            'nis.unique' => 'NIS sudah terdaftar',
-            'nis.digits_between' => 'NIS harus berisi 1-20 angka',
-            'nisn.required' => 'NISN wajib diisi',
-            'nisn.numeric' => 'NISN harus berisi angka saja',
-            'nisn.unique' => 'NISN sudah terdaftar',
-            'nisn.digits_between' => 'NISN harus berisi 1-20 angka',
-        ]);
-
-        try {
-            $siswa->update($validated);
-            return redirect('/admin/siswa')->with('success', 'Data siswa berhasil diperbarui');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memperbarui data siswa: ' . $e->getMessage());
-        }
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Siswa $siswa)
     {
-        try {
-            $siswa = Siswa::findOrFail($id);
-            $siswa->delete();
-            return redirect('/admin/siswa')->with('success', 'Data siswa berhasil dihapus');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menghapus data siswa: ' . $e->getMessage());
-        }
+        //
     }
 }

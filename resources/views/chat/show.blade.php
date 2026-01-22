@@ -32,6 +32,14 @@
                 <button class="btn btn-sm btn-outline-secondary" style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-video"></i>
                 </button>
+                @if(auth()->user()->hasRole('guru_bk'))
+                    <form id="selesaiForm" action="{{ route('chat.selesai', $otherUser->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="button" class="btn btn-sm btn-success" onclick="confirmSelesaiKonseling()" title="Selesai Konseling">
+                            <i class="fas fa-flag-checkered"></i> Selesai
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
@@ -165,6 +173,24 @@
         })
         .catch(error => console.error('Error sending message:', error));
     });
+
+    function confirmSelesaiKonseling() {
+        Swal.fire({
+            title: 'Selesai Konseling?',
+            text: 'Setelah ini, sesi konseling akan ditandai sebagai selesai dan akan membuat riwayat konseling baru.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Selesai',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('selesaiForm').submit();
+            }
+        });
+    }
 
     // Initial scroll
     scrollToBottom();

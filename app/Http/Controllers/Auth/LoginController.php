@@ -33,6 +33,10 @@ class LoginController extends Controller
         $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required',
+            'g-recaptcha-response' => 'required|recaptcha',
+        ], [
+            'g-recaptcha-response.required' => 'Silakan verifikasi reCAPTCHA.',
+            'g-recaptcha-response.recaptcha' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
         ]);
 
         if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {

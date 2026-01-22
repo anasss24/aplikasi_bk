@@ -11,6 +11,7 @@ class MateriBK extends Model
 
     protected $table = 'materi_bk';
     protected $primaryKey = 'materi_id';
+    protected $keyType = 'int';
     public $timestamps = true;
 
     protected $fillable = [
